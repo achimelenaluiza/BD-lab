@@ -1,0 +1,196 @@
+Exercitiul 1
+
+SELECT first_name||' '||last_name||' castiga '||salary||' dar doreste '||salary*3 "Salariu ideal"
+FROM employees;
+
+SELECT CONCAT(first_name,' ')||CONCAT(last_name,' castiga ')||salary||' dar doreste '||salary*3 "Salariu ideal"
+FROM employees;
+
+Exercitiul 2
+
+SELECT INITCAP(first_name) "prenume", UPPER(last_name) "nume", LENGTH(first_name||last_name) "lungime"
+FROM employees
+WHERE SUBSTR(first_name,3,1) = 'A' OR SUBSTR(first_name,1,1) = 'J' OR first_name LIKE 'M%'
+ORDER BY LENGTH(first_name||last_name) DESC;
+
+SELECT INITCAP(first_name) "prenume", UPPER(last_name) "nume", LENGTH(first_name||last_name) "lungime"
+FROM employees
+WHERE first_name LIKE '__a%' OR first_name LIKE 'J%' OR first_name LIKE 'M%'
+ORDER BY LENGTH(first_name||last_name) DESC;
+
+Exercitiul 3
+
+SELECT first_name, employee_id, last_name, department_id
+FROM employees
+WHERE LOWER(first_name) LIKE '%steven%';
+
+Exercitiul 4
+
+SELECT employee_id "cod", first_name "nume", LENGTH(first_name) "lungime nume", INSTR(LOWER(first_name),'a')"pozitie prim a"
+FROM employees
+WHERE LOWER(first_name) LIKE '%e';
+
+Exercitiul 5
+
+SELECT first_name, last_name
+FROM employees
+WHERE MOD(TRUNC(SYSDATE - hire_date), 7) = 0;
+
+Exercitiul 6
+
+SELECT employee_id, last_name, salary, ROUND(salary * 1.15, 2) "Salariu nou",
+    MOD(FLOOR(ROUND(salary * 1.15, 2) / 100),10) "Numar sute"
+FROM employees
+WHERE MOD(salary, 1000) != 0;
+
+Exercitiul 7
+
+SELECT last_name "nume angajat" , RPAD(TO_CHAR(hire_date),14) "data angajarii"
+FROM employees
+WHERE commission_pct IS NOT null;
+
+Exercitiul 8
+
+SELECT TO_CHAR(SYSDATE + 30, 'DD/MM/YYYY HH24:MI:SS')
+FROM dual;
+
+Exercitiul 9
+
+SELECT ROUND(LAST_DAY('01-DEC-2020')-SYSDATE)
+FROM dual;
+
+Exercitiul 10 a)
+
+SELECT TO_CHAR(SYSDATE + 0.5, 'DD/MM/YYYY HH24:MI:SS') "peste 12 ore"
+FROM dual;
+
+Exercitiul 10 b)
+
+SELECT TO_CHAR(SYSDATE + 5 * (1/(24*60)), 'DD/MM/YYYY HH24:MI:SS') "peste 5 minute"
+FROM dual;
+
+Exercitiul 11
+
+SELECT first_name||' '||last_name, hire_date, NEXT_DAY(ADD_MONTHS(hire_date, 6),'Monday')"negociere"
+FROM employees;
+
+Exercitiul 12
+
+SELECT last_name,ROUND(MONTHS_BETWEEN(SYSDATE, hire_date)) "luni lucrate"
+FROM employees
+ORDER BY 'luni lucrate';
+
+Exercitiul 13
+
+SELECT last_name, hire_date, TO_CHAR(hire_date, 'D') "zi" 
+FROM employees
+ORDER BY "zi";
+
+Exercitiul 14
+
+SELECT first_name || ' ' || last_name "Nume",
+    NVL(TO_CHAR(commission_pct), 'Fara comision') "Comision"
+FROM employees;
+
+
+Exercițiul 15
+
+SELECT last_name, salary, commission_pct
+FROM employees
+WHERE salary * (1 + NVL(commission_pct, 0)) >= 10000;
+
+
+Exercițiul 16
+
+SELECT first_name || ' ' || last_name "Nume",  job_id, salary,
+    salary * (1 + DECODE(job_id,
+                    'IT_PROG', 0.2,
+                    'SA_REP', 0.25,
+                    'SA_MAN', 0.35,
+                    0)) "Salariu renegociat"
+FROM employees;
+
+Exercițiul 17
+
+SELECT first_name, e.department_id, d.department_name
+FROM employees e JOIN departments d
+ON e.department_id = d.department_id;
+
+
+Exercițiul 18
+
+SELECT DISTINCT(e.job_id)
+FROM employees e JOIN departments d
+ON e.department_id = d.department_id
+WHERE e.department_id = 30;
+
+
+Exercițiul 19
+
+SELECT first_name, last_name, department_name, location_id
+FROM employees e JOIN departments d
+ON e.department_id = d.department_id
+WHERE NVL(commission_pct,0) > 0;
+
+Exercițiul 20
+
+SELECT last_name, department_name
+FROM employees e
+INNER JOIN departments d
+ON e.department_id = d.department_id
+WHERE LOWER(last_name) LIKE '%a%';
+
+Exercițiul 21
+
+SELECT e.last_name, e.job_id, e.employee_id, d.department_name, d.location_id
+FROM employees e JOIN departments d
+                    ON e.department_id = d.department_id
+                JOIN locations l
+                    ON l.location_id = d.location_id
+WHERE l.city = 'Oxford';
+
+Exercitiul 22
+
+SELECT e1.employee_id "#Ang", e1.last_name "Angajat", e2.employee_id "#Mgr" , e2.last_name "Manager"
+FROM employees e1 
+    JOIN employees e2
+        ON e1.manager_id = e2.employee_id;
+
+Exercitiul 23
+
+SELECT e1.employee_id "#Ang", e1.last_name "Angajat", e2.employee_id "#Mgr" , e2.last_name "Manager"
+FROM employees e1 
+LEFT OUTER JOIN employees e2
+ON e1.manager_id = e2.employee_id
+ORDER BY e1.employee_id;
+
+Exercitiul 24
+
+SELECT e1.last_name "nume", e1.department_id "departament", e2.last_name "Colegi"
+FROM employees e1 INNER JOIN employees e2
+ON e1.department_id = e2.department_id
+WHERE e1.last_name != e2.last_name
+ORDER BY e1.last_name;
+
+Exercitiul 25
+
+SELECT e.last_name, e.job_id, j.job_title, d.department_name, e.salary
+FROM employees e JOIN jobs j
+    ON e.job_id = j.job_id
+JOIN  departments d
+    ON e.department_id = d.department_id
+ORDER BY last_name;
+
+Exercitiul 26
+
+SELECT e1.first_name||' '||e1.last_name "nume", e1.hire_date
+FROM employees e1
+WHERE hire_date > (SELECT hire_date FROM employees WHERE last_name = 'Gates');
+
+Exercitiul 27
+
+SELECT e1.last_name, e1.hire_date, e2.last_name, e2.hire_date
+FROM employees e1 INNER JOIN employees e2
+ON e1.manager_id = e2.employee_id
+WHERE e1.hire_date < e2.hire_date;
+
