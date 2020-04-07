@@ -1,0 +1,215 @@
+Exercitiul 1
+
+SELECT last_name, TO_CHAR(hire_date, 'MON'), TO_CHAR(hire_date, 'YYYY')
+FROM employees 
+WHERE department_id = 
+    (SELECT department_id FROM employees WHERE last_name = 'Gates')
+    AND last_name != 'Gates'
+    AND LOWER(last_name) LIKE '%a%'
+ORDER BY last_name;
+
+SELECT e2.last_name, TO_CHAR(e2.hire_date, 'MON'), TO_CHAR(e2.hire_date, 'YYYY')
+FROM employees e1 
+    JOIN employees e2 ON (e1.department_id = e2.department_id)
+WHERE e1.last_name = 'Gates' AND e2.last_name != 'Gates'
+    AND INSTR(LOWER(e2.last_name),'a') > 0
+ORDER BY e2.last_name;
+
+Exercitiul 2
+
+SELECT DISTINCT(e1.employee_id), e1.last_name, e1.department_id, d.department_name
+FROM employees e1
+    JOIN employees e2 ON (e1.department_id = e2.department_id)
+    JOIN departments d ON (e1.department_id = d.department_id)
+WHERE LOWER(e2.last_name) LIKE '%t%'
+ORDER BY e1.last_name;
+
+SELECT DISTINCT(e1.employee_id), e1.last_name, e1.department_id, d.department_name
+FROM employees e1
+    JOIN departments d ON (e1.department_id = d.department_id)
+WHERE e1.department_id IN ( SELECT department_id FROM employees  
+     WHERE LOWER(last_name) LIKE '%t%')
+ORDER BY e1.last_name;
+
+Exercitiul 3
+
+SELECT e.last_name, e.salary, j.job_title, l.city, l.country_id, e.manager_id
+FROM employees e
+    JOIN jobs j ON e.job_id = j.job_id
+    JOIN departments d ON e.department_id = d.department_id
+    JOIN locations l ON d.location_id = l.location_id
+WHERE e.manager_id IN 
+    (SELECT employee_id FROM employees WHERE last_name = 'King')
+ORDER BY e.last_name;
+
+Exercitiul 4
+
+SELECT e.department_id, d.department_name, e.last_name, j.job_title, TO_CHAR(e.salary, '$99,999.00') 
+FROM employees e
+    JOIN jobs j ON e.job_id = j.job_id
+    JOIN departments d ON e.department_id = d.department_id
+WHERE INSTR(LOWER(d.department_name),'ti') > 0
+ORDER BY d.department_name, e.last_name;
+
+Exercitiul 5
+
+SELECT e.last_name, d.department_name, d.department_id, l.city, e.job_id
+FROM employees e
+    JOIN departments d ON e.department_id = d.department_id
+    JOIN locations l ON l.location_id = d.location_id
+WHERE l.city = 'Oxford';
+
+Exercitiul 6
+
+SELECT DISTINCT(e.employee_id), e.last_name, e.salary
+FROM employees e
+    JOIN jobs j ON e.job_id = j.job_id
+    JOIN employees e2 ON e.department_id = e2.department_id
+WHERE e.salary > (j.min_salary + j.max_salary)/2 AND e2.last_name LIKE '%t%';
+
+Exercitiul 7
+
+SELECT e.last_name, d.department_name
+FROM departments d
+    RIGHT JOIN employees e ON e.department_id = d.department_id;
+    
+SELECT e.last_name, d.department_name
+FROM employees e
+    LEFT JOIN departments d ON e.department_id = d.department_id;
+    
+Exercitiul 8
+
+SELECT d.department_name, e.last_name
+FROM departments d
+    LEFT JOIN employees e ON e.department_id = d.department_id
+ORDER BY d.department_name;
+
+Exercitiul 9
+
+SELECT d.department_name, e.last_name
+FROM departments d
+    FULL JOIN employees e ON e.department_id = d.department_id;
+    
+Exercitiul 10
+
+SELECT department_id FROM departments WHERE LOWER(department_name) LIKE '%re%' 
+UNION
+SELECT department_id FROM employees WHERE job_id = 'SA_REP';
+
+Exercitiul 11 (pastreaza duplicatele)
+
+SELECT department_id FROM departments WHERE LOWER(department_name) LIKE '%re%' 
+UNION ALL
+SELECT department_id FROM employees WHERE job_id = 'SA_REP';
+
+Exercitiul 12
+
+SELECT d.department_id 
+FROM employees e
+    RIGHT JOIN departments d ON e.department_id = d.department_id
+WHERE e.last_name IS null
+ORDER BY d.department_id;
+
+SELECT department_id FROM departments
+MINUS
+SELECT department_id FROM employees;
+
+Exercitiul 13
+
+SELECT department_id FROM departments WHERE LOWER(department_name) LIKE '%re%'
+INTERSECT
+SELECT department_id FROM employees WHERE job_id = 'HR_REP';
+
+Exercitiul 14
+
+SELECT last_name, employee_id, job_id 
+FROM employees
+WHERE salary > 3000
+UNION
+SELECT e.last_name, e.employee_id, e.job_id 
+FROM employees e
+    JOIN jobs j ON e.job_id = j.job_id 
+WHERE e.salary = (j.min_salary + j.max_salary)/2; 
+
+Exercitiul 15
+
+SELECT last_name, hire_date
+FROM employees
+WHERE hire_date > (SELECT hire_date FROM employees WHERE last_name = 'Gates');
+
+Exercitiul 16
+
+SELECT last_name, salary
+FROM employees
+WHERE department_id IN (SELECT department_id FROM employees WHERE last_name = 'Gates')
+    AND last_name != 'Gates'
+ORDER BY last_name;    
+
+Exercitiul 17
+
+SELECT last_name, salary
+FROM employees
+WHERE manager_id = (SELECT employee_id FROM employees WHERE manager_id IS null);
+
+Exercitiul 18
+
+SELECT last_name, department_id, salary
+FROM employees
+WHERE department_id IN (SELECT department_id FROM employees WHERE commission_pct IS NOT null);
+
+Exercitiul 19
+
+SELECT employee_id, last_name, salary
+FROM employees e
+WHERE salary > (SELECT (min_salary + max_salary)/2 FROM jobs WHERE job_id = e.job_id)
+and department_id in (select department_id from employees where lower(last_name) like '%t%');
+
+Exerecitiul 20
+
+SELECT last_name 
+FROM employees
+WHERE salary > ALL (SELECT salary FROM employees WHERE job_id = 'CLERK')
+ORDER BY salary DESC;
+
+SELECT last_name 
+FROM employees
+WHERE salary > ANY (SELECT salary FROM employees WHERE job_id = 'CLERK')
+ORDER BY salary DESC;
+
+Exercitiul 21
+
+SELECT e.last_name, d.department_name, e.salary
+FROM employees e
+    JOIN departments d ON e.department_id = d.department_id
+WHERE e.commission_pct IS null AND e.manager_id IN 
+    (SELECT manager_id FROM employees 
+    WHERE manager_id IN (SELECT employee_id FROM employees WHERE commission_pct IS NOT null)
+    );
+
+Exercitiul 22
+
+SELECT last_name, department_id, salary, job_id
+FROM employees
+WHERE salary IN (SELECT e.salary 
+                FROM employees e
+                JOIN departments d ON e.department_id = d.department_id
+                JOIN locations l ON d.location_id = l.location_id
+                WHERE l.city = 'Oxford')
+INTERSECT
+SELECT last_name, department_id, salary, job_id
+FROM employees
+WHERE commission_pct IN (SELECT e.commission_pct 
+                FROM employees e
+                JOIN departments d ON e.department_id = d.department_id
+                JOIN locations l ON d.location_id = l.location_id
+                WHERE l.city = 'Oxford'); 
+
+Exercitiul 23
+
+SELECT last_name, department_id, job_id
+FROM employees
+WHERE department_id IN (SELECT department_id FROM departments WHERE location_id =
+                        (SELECT location_id FROM locations WHERE city = 'Toronto')); 
+
+
+
